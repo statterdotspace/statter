@@ -50,6 +50,8 @@ export class WorkspaceOrm {
   @OneToMany(() => WorkspaceMemberOrm, (member) => member.workspace)
   members!: WorkspaceMemberOrm[];
 
+  membersCount?: number;
+
   @OneToMany(() => InvitationOrm, (invitation) => invitation.workspace)
   invitations!: InvitationOrm[];
 

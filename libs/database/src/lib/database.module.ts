@@ -1,6 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule, type TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import {
+  CheckOrm,
+  InvitationOrm,
+  MonitorOrm,
+  ProjectOrm,
+  UserOrm,
+  WorkspaceMemberOrm,
+  WorkspaceOrm,
+} from '../entities';
 
 @Module({
   imports: [
@@ -13,7 +22,16 @@ import { ConfigService } from '@nestjs/config';
         username: configService.getOrThrow('database.username'),
         password: configService.getOrThrow('database.password'),
         database: configService.getOrThrow('database.database'),
-        entities: ['dist/**/*.entity.{js,ts}', 'src/**/*.entity.{js,ts}'],
+        entities: [
+          UserOrm,
+          WorkspaceOrm,
+          WorkspaceMemberOrm,
+          InvitationOrm,
+          ProjectOrm,
+          MonitorOrm,
+          CheckOrm,
+        ],
+        autoLoadEntities: true,
         migrations: [
           'dist/database/migrations/**/*.{js,ts}',
           'src/database/migrations/**/*.{js,ts}',

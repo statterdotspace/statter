@@ -53,3 +53,5 @@ out
 *.env.development
 *.env.test
 *.env.production
+
+vite.config.*.timestamp*
