@@ -15,7 +15,7 @@ import {
 import { useEffect, useState } from 'react';
 import { Button } from '@/shared/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
-import { authApi, setWorkspaceId } from '@/shared/api';
+import { authApi } from '@/shared/api';
 import { WORKSPACE_COOKIE_NAME } from '@/shared/config';
 import type { Workspace } from '@/entities';
 
@@ -47,13 +47,11 @@ const AppShell = ({ children, workspaces, initialWorkspaceId, workspaceSlug }: A
   const navItems = buildNavItems(workspaceSlug);
 
   useEffect(() => {
-    setWorkspaceId(workspaceId);
     setWorkspaceCookie(workspaceId);
   }, [workspaceId]);
 
   const handleWorkspaceChange = (nextWorkspaceId: string) => {
     setCurrentWorkspaceId(nextWorkspaceId);
-    setWorkspaceId(nextWorkspaceId);
     setWorkspaceCookie(nextWorkspaceId);
     const nextWorkspace = workspaces.find((workspace) => workspace.id === nextWorkspaceId);
     if (!nextWorkspace) {

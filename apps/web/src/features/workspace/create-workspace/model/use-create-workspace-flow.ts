@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { fileApi, setWorkspaceId, workspaceApi, getErrorMessage } from '@/shared/api';
+import { fileApi, workspaceApi, getErrorMessage } from '@/shared/api';
 import { WORKSPACE_COOKIE_NAME } from '@/shared/config';
 import { useSelectedFileRef } from '@/shared/lib/hooks/use-selected-file-ref';
 import { createWorkspaceSchema } from '@/entities';
@@ -30,7 +30,6 @@ const normalizeSlug = (value: string): string => {
 };
 
 const persistWorkspaceSelection = (workspaceId: string) => {
-  setWorkspaceId(workspaceId);
   document.cookie = `${WORKSPACE_COOKIE_NAME}=${encodeURIComponent(workspaceId)};path=/;max-age=31536000;samesite=lax`;
 };
 

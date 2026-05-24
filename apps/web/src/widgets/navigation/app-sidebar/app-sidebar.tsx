@@ -22,7 +22,6 @@ import {
   SelectValue,
 } from '@/shared/ui/select';
 import { Separator } from '@/shared/ui/separator';
-import { setWorkspaceId } from '@/shared/api';
 import { WORKSPACE_COOKIE_NAME } from '@/shared/config';
 import type { Workspace } from '@/entities';
 import { toast } from 'sonner';
@@ -68,7 +67,6 @@ const AppSidebar = ({
   const membersText = `${membersCount} ${membersCount === 1 ? 'Member' : 'Members'}`;
 
   const persistWorkspaceSelection = (workspaceId: string) => {
-    setWorkspaceId(workspaceId);
     document.cookie = `${WORKSPACE_COOKIE_NAME}=${encodeURIComponent(workspaceId)};path=/;max-age=31536000;samesite=lax`;
   };
 

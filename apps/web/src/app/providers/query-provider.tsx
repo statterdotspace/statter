@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { Toaster } from '@/shared/ui/sonner';
-import { configureApiAuth, getErrorMessage } from '@/shared/api';
-import { ROUTES } from '@/shared/config';
+import { getErrorMessage } from '@/shared/api';
 import { toast } from 'sonner';
 
 interface Props {
@@ -38,16 +37,6 @@ const QueryProvider = ({ children }: Props) => {
       }),
     []
   );
-
-  useEffect(() => {
-    configureApiAuth({
-      onUnauthorized: () => {
-        if (window.location.pathname !== ROUTES.SIGN_IN) {
-          window.location.assign(ROUTES.SIGN_IN);
-        }
-      },
-    });
-  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

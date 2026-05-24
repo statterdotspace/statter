@@ -1,9 +1,8 @@
-import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { AxiosError } from 'axios';
 import { WorkspaceContextInit } from '@/features/workspace';
 import { AppSidebar, MainNavbar } from '@/widgets/navigation';
-import { serverApi } from '@/shared/api';
+import { workspaceApi } from '@/shared/api';
 import { ROUTES } from '@/shared/config';
 import type { Workspace } from '@/entities';
 
@@ -13,14 +12,12 @@ interface AppLayoutProps {
 }
 
 export default async function AppLayout({ children, params }: AppLayoutProps) {
-  const headerStore = await headers();
-  const cookieHeader = headerStore.get('cookie') ?? '';
   const { workspaceSlug } = await params;
 
   let workspaces: Workspace[] = [];
 
   try {
-    workspaces = await serverApi.listWorkspaces(cookieHeader);
+    workspaces = await workspaceApi.list();
   } catch (err) {
     console.log(err);
     if (err instanceof AxiosError && err.response?.status === 401) {

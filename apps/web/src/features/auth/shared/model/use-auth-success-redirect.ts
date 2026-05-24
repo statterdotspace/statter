@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { setWorkspaceId, workspaceApi } from '@/shared/api';
+import { workspaceApi } from '@/shared/api';
 import { ROUTES, WORKSPACE_COOKIE_NAME } from '@/shared/config';
 
 const useAuthSuccessRedirect = () => {
@@ -17,7 +17,6 @@ const useAuthSuccessRedirect = () => {
       return;
     }
 
-    setWorkspaceId(firstWorkspace.id);
     document.cookie = `${WORKSPACE_COOKIE_NAME}=${encodeURIComponent(firstWorkspace.id)};path=/;max-age=31536000;samesite=lax`;
 
     router.replace(`/${firstWorkspace.slug}`);
