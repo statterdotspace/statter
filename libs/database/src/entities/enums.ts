@@ -38,6 +38,7 @@ export enum MonitorType {
 
 export enum MonitorRegion {
   EU = 'eu',
+  UA = 'ua',
   US = 'us',
   ASIA = 'asia',
 }

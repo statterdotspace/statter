@@ -1,7 +1,7 @@
 import type { Check } from '@/entities/check';
 
 export type MonitorType = 'http' | 'https' | 'tcp' | 'ping';
-export type MonitorRegion = 'eu' | 'us' | 'asia';
+export type MonitorRegion = 'eu' | 'ua' | 'us' | 'asia';
 export type MonitorStatus = 'active' | 'paused' | 'disabled';
 
 export interface Monitor {

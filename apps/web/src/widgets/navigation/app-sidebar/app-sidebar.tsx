@@ -24,7 +24,6 @@ import {
 import { Separator } from '@/shared/ui/separator';
 import { WORKSPACE_COOKIE_NAME } from '@/shared/config';
 import type { Workspace } from '@/entities';
-import { toast } from 'sonner';
 
 interface AppSidebarProps {
   workspaces: Workspace[];
@@ -146,15 +145,15 @@ const AppSidebar = ({
                     Settings
                   </Button>
                 </Link>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 justify-start gap-2"
-                  onClick={() => toast('Invite flow will be added soon')}
+                <Link
+                  href={`/${currentWorkspace?.slug ?? selectedWorkspaceSlug}/settings/members`}
+                  className="flex-1"
                 >
-                  <UserPlus2 className="size-4" />
-                  Invite members
-                </Button>
+                  <Button variant="outline" size="sm" className="w-full justify-start gap-2">
+                    <UserPlus2 className="size-4" />
+                    Invite members
+                  </Button>
+                </Link>
               </div>
 
               <Separator />

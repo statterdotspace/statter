@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  Index,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -46,6 +47,10 @@ export class WorkspaceOrm {
 
   @Column({ name: 'max_monitors', type: 'int', default: 10 })
   maxMonitors!: number;
+
+  @Index({ unique: true })
+  @Column({ name: 'invite_code', type: 'varchar', length: 255 })
+  inviteCode!: string;
 
   @OneToMany(() => WorkspaceMemberOrm, (member) => member.workspace)
   members!: WorkspaceMemberOrm[];

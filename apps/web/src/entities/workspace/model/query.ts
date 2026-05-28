@@ -18,6 +18,7 @@ const useSettings = () => {
     onSuccess: async () => {
       toast.success('Workspace updated');
       await queryClient.invalidateQueries({ queryKey: ['workspace-current'] });
+      await queryClient.invalidateQueries({ queryKey: ['workspaces'] });
     },
     onError: (error) => toast.error(getErrorMessage(error)),
   });
@@ -51,6 +52,17 @@ const useSettings = () => {
     onSuccess: async () => {
       toast.success('Workspace logo updated');
       await queryClient.invalidateQueries({ queryKey: ['workspace-current'] });
+      await queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+    },
+    onError: (error) => toast.error(getErrorMessage(error)),
+  });
+
+  const deleteWorkspaceMutation = useMutation({
+    mutationFn: () => workspaceApi.deleteCurrent(),
+    onSuccess: async () => {
+      toast.success('Workspace deleted');
+      await queryClient.invalidateQueries({ queryKey: ['workspace-current'] });
+      await queryClient.invalidateQueries({ queryKey: ['workspaces'] });
     },
     onError: (error) => toast.error(getErrorMessage(error)),
   });
@@ -60,6 +72,7 @@ const useSettings = () => {
     updateWorkspaceMutation,
     uploadAvatarMutation,
     uploadWorkspaceLogoMutation,
+    deleteWorkspaceMutation,
   };
 };
 

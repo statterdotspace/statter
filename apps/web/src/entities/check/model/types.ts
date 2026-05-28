@@ -7,12 +7,17 @@ export interface Check {
   status: CheckStatus;
   statusCode: number | null;
   latencyMs: number | null;
-  region: 'eu' | 'us' | 'asia';
+  region: 'eu' | 'ua';
   responseSizeBytes: number | null;
   errorMessage: string | null;
 }
 
 export interface CheckListQuery {
   page?: number;
+  limit?: number;
+}
+
+export interface CheckHistoryQuery {
+  days?: number;
   limit?: number;
 }

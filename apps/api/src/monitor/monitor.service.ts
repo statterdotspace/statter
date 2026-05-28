@@ -94,6 +94,10 @@ export class MonitorService {
     });
   }
 
+  async findById(id: string) {
+    return await this.monitorRepo.findOne({ where: { id } });
+  }
+
   async createMonitor(params: Partial<MonitorOrm>) {
     return await this.monitorRepo.save(params);
   }

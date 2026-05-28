@@ -13,6 +13,8 @@ import { CheckModule } from './check/check.module';
 import { StorageModule } from './core/modules/storage/storage.module';
 import { RedisModule } from './core/modules/redis/redis.module';
 import { MailerModule } from './core/modules/mailer/mailer.module';
+import { InvitationsModule } from './invitations/invitations.module';
+import { MembersModule } from './members/members.module';
 
 @Module({
   imports: [
@@ -25,9 +27,11 @@ import { MailerModule } from './core/modules/mailer/mailer.module';
     UsersModule,
     AuthModule,
     WorkspaceModule,
+    InvitationsModule,
     ProjectModule,
     MonitorModule,
     CheckModule,
+    MembersModule,
   ],
   controllers: [AppController],
 })

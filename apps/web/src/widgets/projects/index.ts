@@ -1,1 +1,1 @@
-export { ProjectsDashboard } from './projects-dashboard';
+export { ProjectList } from './ui/project-list';

@@ -7,6 +7,7 @@ import { MonitorExistsGuard } from '../monitor/guards/monitor-exists.guard';
 import { WorkspaceExistsGuard } from '../workspace/guards/workspace-exists.guard';
 import { WorkspaceHeaderGuard } from '../workspace/guards/workspace-header.guard';
 import { WorkspaceMemberGuard } from '../workspace/guards/workspace-member.guard';
+import { CheckHistoryQueryDto } from './dto/request/check-history-query.dto';
 import { ListChecksQueryDto } from './dto/request/list-checks-query.dto';
 import { CheckResponseDto } from './dto/response/check-response.dto';
 import { CheckService } from './check.service';
@@ -39,5 +40,18 @@ export class CheckController {
     const check = await this.checkService.findLatestByMonitorId(monitor.id);
 
     return check ? toDto(CheckResponseDto, check) : null;
+  }
+
+  @Get('history')
+  async history(
+    @Param('monitorId', ParseUUIDPipe) _monitorId: string,
+    @CurrentMonitor() monitor: MonitorOrm,
+    @Query() query: CheckHistoryQueryDto
+  ) {
+    const days = query.days ?? 30;
+    const limit = query.limit ?? 1000;
+    const checks = await this.checkService.findRecentByMonitorId(monitor.id, days, limit);
+
+    return checks.map((check) => toDto(CheckResponseDto, check));
   }
 }

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Globe, Link2 } from 'lucide-react';
 import type { Monitor } from '@/entities';
 import { Checkbox } from '@/shared/ui/checkbox';
@@ -7,6 +8,7 @@ import { UptimeBar } from './uptime-bar';
 
 interface MonitorListItemProps {
   monitor: Monitor;
+  workspaceSlug: string;
   isSelected: boolean;
   onToggleSelect: (monitorId: string, checked: boolean) => void;
   onEdit: (monitor: Monitor) => void;
@@ -15,6 +17,7 @@ interface MonitorListItemProps {
 
 const MonitorListItem = ({
   monitor,
+  workspaceSlug,
   isSelected,
   onToggleSelect,
   onEdit,
@@ -33,9 +36,14 @@ const MonitorListItem = ({
         />
       </div>
 
-      <div className="min-w-0 flex-1 space-y-2.5">
+      <Link
+        href={`/${workspaceSlug}/monitors/${monitor.id}`}
+        className="min-w-0 flex-1 space-y-2.5 px-1 py-0.5"
+      >
         <div className="flex flex-wrap items-center gap-2">
-          <p className="truncate text-lg leading-none font-semibold text-neutral-900">{monitor.name}</p>
+          <p className="truncate hover:text-primary transition-colors text-lg leading-none font-semibold text-neutral-900">
+            {monitor.name}
+          </p>
           <span
             className={`rounded-full border px-2 py-0.5 text-xs font-medium ${monitorStatusClass[monitor.status]}`}
           >
@@ -55,7 +63,7 @@ const MonitorListItem = ({
         </div>
 
         <UptimeBar uptime={uptime} seed={monitor.id} />
-      </div>
+      </Link>
 
       <MonitorActionsMenu onEdit={() => onEdit(monitor)} onDelete={() => onDelete(monitor)} />
     </article>

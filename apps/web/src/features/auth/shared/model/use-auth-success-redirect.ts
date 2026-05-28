@@ -7,7 +7,18 @@ import { ROUTES, WORKSPACE_COOKIE_NAME } from '@/shared/config';
 const useAuthSuccessRedirect = () => {
   const router = useRouter();
 
-  const redirectAfterAuth = async () => {
+  const redirectAfterAuth = async (redirectTarget?: string | null) => {
+    const safeRedirectTarget =
+      redirectTarget && redirectTarget.startsWith('/') && !redirectTarget.startsWith('//')
+        ? redirectTarget
+        : null;
+
+    if (safeRedirectTarget) {
+      router.replace(safeRedirectTarget);
+      router.refresh();
+      return;
+    }
+
     const workspaces = await workspaceApi.list();
     const firstWorkspace = workspaces[0];
 

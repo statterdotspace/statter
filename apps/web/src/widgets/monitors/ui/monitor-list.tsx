@@ -5,6 +5,7 @@ import { MonitorListItem } from './monitor-list-item';
 interface MonitorListProps {
   isLoading: boolean;
   monitors: Monitor[];
+  workspaceSlug: string;
   selectedMonitorIds: ReadonlySet<string>;
   onToggleSelect: (monitorId: string, checked: boolean) => void;
   onEdit: (monitor: Monitor) => void;
@@ -14,6 +15,7 @@ interface MonitorListProps {
 const MonitorList = ({
   isLoading,
   monitors,
+  workspaceSlug,
   selectedMonitorIds,
   onToggleSelect,
   onEdit,
@@ -39,6 +41,7 @@ const MonitorList = ({
                 <MonitorListItem
                   key={monitor.id}
                   monitor={monitor}
+                  workspaceSlug={workspaceSlug}
                   isSelected={selectedMonitorIds.has(monitor.id)}
                   onToggleSelect={onToggleSelect}
                   onEdit={onEdit}

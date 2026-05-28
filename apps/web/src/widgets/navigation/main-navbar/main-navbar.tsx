@@ -52,7 +52,10 @@ const buildMainMenu = (workspaceSlug: string): ISection[] => [
 const buildSettingsMenu = (workspaceSlug: string): ISection[] => [
   {
     title: 'Settings',
-    links: [{ name: 'General', path: `/${workspaceSlug}/settings` }],
+    links: [
+      { name: 'General', path: `/${workspaceSlug}/settings` },
+      { name: 'Members', path: `/${workspaceSlug}/settings/members` },
+    ],
   },
 ];
 

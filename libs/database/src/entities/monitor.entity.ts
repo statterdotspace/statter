@@ -85,13 +85,16 @@ export class MonitorOrm {
   status!: MonitorStatus;
 
   @Column({ name: 'last_check_at', type: 'timestamptz', nullable: true })
-  lastCheckAt?: Date;
+  lastCheckAt?: Date | null;
 
   @Column({ name: 'last_status', type: 'varchar', nullable: true })
-  lastStatus?: string;
+  lastStatus?: string | null;
 
   @Column({ name: 'last_latency_ms', type: 'int', nullable: true })
-  lastLatencyMs?: number;
+  lastLatencyMs?: number | null;
+
+  @Column({ name: 'last_queued_at', type: 'timestamptz', nullable: true })
+  lastQueuedAt?: Date | null;
 
   @OneToMany(() => CheckOrm, (check) => check.monitor)
   checks!: CheckOrm[];

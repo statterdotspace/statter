@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { authApi } from '@/shared/api';
 import { ROUTES } from '@/shared/config';
 import { AuthHeader } from '../../shared/ui/auth-header';
@@ -10,8 +11,10 @@ import { SignInOtpForm } from './sign-in-otp-form';
 import { useSignInForm } from '../model/use-sign-in-form';
 
 const SignInForm = () => {
+  const searchParams = useSearchParams();
+  const redirectTarget = searchParams.get('redirect');
   const { form, otpForm, isPending, isOtpStage, otpEmail, handleSubmit, handleOtpSubmit, resetOtpStage } =
-    useSignInForm();
+    useSignInForm({ redirectTarget });
 
   const googleAuthUrl = authApi.getGoogleAuthUrl();
   const githubAuthUrl = authApi.getGithubAuthUrl();
@@ -35,7 +38,10 @@ const SignInForm = () => {
 
       <p className="mt-5 text-center text-sm text-neutral-600">
         Don&apos;t have an account?{' '}
-        <Link href={ROUTES.SIGN_UP} className="font-medium text-primary">
+        <Link
+          href={redirectTarget ? `${ROUTES.SIGN_UP}?redirect=${encodeURIComponent(redirectTarget)}` : ROUTES.SIGN_UP}
+          className="font-medium text-primary"
+        >
           Sign Up
         </Link>
       </p>

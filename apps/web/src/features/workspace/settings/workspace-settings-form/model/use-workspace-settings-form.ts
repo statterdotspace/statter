@@ -11,9 +11,28 @@ const workspaceSettingsDefaults: UpdateWorkspacePayload = {
   slug: '',
 };
 
+const WORKSPACE_NAME_MAX_LENGTH = 32;
+const WORKSPACE_SLUG_MAX_LENGTH = 48;
+const WORKSPACE_SLUG_SEPARATOR = '-';
+
+const normalizeWorkspaceName = (value: string): string => {
+  return value.slice(0, WORKSPACE_NAME_MAX_LENGTH);
+};
+
+const normalizeWorkspaceSlug = (value: string): string => {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, WORKSPACE_SLUG_SEPARATOR)
+    .replace(/-+/g, WORKSPACE_SLUG_SEPARATOR)
+    .replace(/^-|-$/g, '')
+    .slice(0, WORKSPACE_SLUG_MAX_LENGTH);
+};
+
 interface UseWorkspaceSettingsFormOptions {
   workspace?: Workspace;
-  onSave: (payload: UpdateWorkspacePayload) => Promise<unknown>;
+  onSave: (payload: UpdateWorkspacePayload) => Promise<Workspace>;
   isPending: boolean;
 }
 
@@ -40,9 +59,57 @@ const useWorkspaceSettingsForm = ({
     reset();
   }, [workspace]);
 
-  const handleSubmit = form.handleSubmit(async (values) => {
+  const workspaceName = form.watch('name') ?? '';
+  const workspaceSlug = form.watch('slug') ?? '';
+
+  const onWorkspaceNameChange = (value: string) => {
+    form.setValue('name', normalizeWorkspaceName(value), {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
+
+  const onWorkspaceSlugChange = (value: string) => {
+    form.setValue('slug', normalizeWorkspaceSlug(value), {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
+
+  const handleSaveWorkspaceName = form.handleSubmit(async (values) => {
+    const name = values.name?.trim() ?? '';
+    if (!name) {
+      form.setError('name', {
+        type: 'validate',
+        message: 'Workspace name is required',
+      });
+      return;
+    }
+
     try {
-      await onSave(values);
+      await onSave({ name });
+    } catch {
+      // Mutation hook handles toast errors.
+    }
+  });
+
+  const handleSaveWorkspaceSlug = form.handleSubmit(async (values) => {
+    const slug = normalizeWorkspaceSlug(values.slug ?? '');
+    if (!slug) {
+      form.setError('slug', {
+        type: 'validate',
+        message: 'Workspace slug is required',
+      });
+      return;
+    }
+
+    form.setValue('slug', slug, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+
+    try {
+      await onSave({ slug });
     } catch {
       // Mutation hook handles toast errors.
     }
@@ -50,7 +117,12 @@ const useWorkspaceSettingsForm = ({
 
   return {
     form,
-    handleSubmit,
+    workspaceName,
+    workspaceSlug,
+    onWorkspaceNameChange,
+    onWorkspaceSlugChange,
+    handleSaveWorkspaceName,
+    handleSaveWorkspaceSlug,
     isSubmitting: isPending,
     reset,
   };

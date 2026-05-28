@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserOrm } from '@statter/database';
 import type { CreateUserParams, UpdateUserParams } from './types/user-params.types';
@@ -14,6 +14,14 @@ export class UsersService {
 
   async findByEmail(email: string) {
     return await this.usersRepo.findOne({ where: { email } });
+  }
+
+  async findByEmails(emails: string[]) {
+    if (emails.length === 0) {
+      return [];
+    }
+
+    return await this.usersRepo.find({ where: { email: In(emails) } });
   }
 
   async findAuthByEmail(email: string) {
@@ -43,7 +51,6 @@ export class UsersService {
   }
 
   async update(id: string, params: UpdateUserParams) {
-    await this.usersRepo.update(id, params);
-    return await this.findById(id);
+    return this.usersRepo.save({ ...params, id });
   }
 }

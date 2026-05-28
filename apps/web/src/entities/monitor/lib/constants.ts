@@ -6,7 +6,7 @@ import type {
 } from '../model/types';
 
 export const monitorTypeOptions: MonitorType[] = ['https', 'http', 'tcp', 'ping'];
-export const monitorRegionOptions: MonitorRegion[] = ['eu', 'us', 'asia'];
+export const monitorRegionOptions: MonitorRegion[] = ['eu', 'ua', 'us', 'asia'];
 export const monitorStatusOptions: MonitorStatus[] = ['active', 'paused', 'disabled'];
 
 export const monitorStatusClass: Record<MonitorStatus, string> = {

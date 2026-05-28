@@ -1,0 +1,3 @@
+export const INVITATION_TOKEN_BYTES = 32;
+export const INVITATION_EMAIL_TTL_DAYS = 14;
+

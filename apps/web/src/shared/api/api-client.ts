@@ -1,6 +1,5 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
-import { ENV_CONFIG } from '../config/env.config';
-import { WORKSPACE_COOKIE_NAME } from '../config/cookie.config';
+import { ENV_CONFIG, WORKSPACE_COOKIE_NAME } from '@/shared/config';
 
 const getCookieValue = (cookieString: string, name: string): string | undefined => {
   const match = cookieString.match(new RegExp(`(^|;\\s*)${name}=([^;]+)`));
@@ -42,9 +41,4 @@ axiosWithToken.interceptors.request.use(async (config: InternalAxiosRequestConfi
   return config;
 });
 
-export {
-  axiosWithToken,
-  axiosDefault,
-  axiosWithToken as apiClient,
-  axiosDefault as apiDefault,
-};
+export { axiosWithToken, axiosDefault, axiosWithToken as apiClient, axiosDefault as apiDefault };

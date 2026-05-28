@@ -1,17 +1,10 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Post, UseGuards } from '@nestjs/common';
 import { WorkspaceMemberRole, UserOrm, WorkspaceOrm } from '@statter/database';
 import { slugify, toDto } from '@statter/utils';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { StorageService } from '../core/modules/storage/storage.service';
+import { createInvitationToken } from '../invitations/helpers/create-invitation-token';
 import { UploadUrlResponseDto } from '../core/modules/storage/dto/response/upload-url-response.dto';
 import { CurrentWorkspace } from './decorators/current-workspace.decorator';
 import { CreateWorkspaceDto } from './dto/request/create-workspace.dto';
@@ -39,6 +32,7 @@ export class WorkspaceController {
       name: dto.name,
       slug: dto.slug ? slugify(dto.slug) : slugify(dto.name),
       logoUrl: dto.logoUrl ?? null,
+      inviteCode: createInvitationToken(),
     });
 
     await this.workspaceService.createMembership({
@@ -100,5 +94,15 @@ export class WorkspaceController {
     });
 
     return toDto(UploadUrlResponseDto, payload);
+  }
+
+  @Post('current/invite-code/reset')
+  @UseGuards(WorkspaceHeaderGuard, WorkspaceExistsGuard, WorkspaceMemberGuard, WorkspaceWriteGuard)
+  async resetInviteCode(@CurrentWorkspace() workspace: WorkspaceOrm) {
+    const updated = await this.workspaceService.update(workspace.id, {
+      inviteCode: createInvitationToken(),
+    });
+
+    return toDto(WorkspaceResponseDto, updated);
   }
 }

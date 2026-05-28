@@ -1,5 +1,10 @@
 import type {
+  AcceptInvitationResponse,
   CreateWorkspacePayload,
+  WorkspaceInviteMembersPayload,
+  WorkspaceInviteMembersResponse,
+  WorkspaceMembersListQuery,
+  WorkspaceMembersListResponse,
   UpdateWorkspacePayload,
   Workspace,
 } from '@/entities';
@@ -37,6 +42,41 @@ const workspaceApi = {
       '/workspaces/current/logo/upload-url',
       payload
     );
+    return response.data;
+  },
+
+  async listMembers(query: WorkspaceMembersListQuery = {}): Promise<WorkspaceMembersListResponse> {
+    const response = await apiClient.get<WorkspaceMembersListResponse>('/workspaces/current/members', {
+      params: {
+        page: query.page ?? 1,
+        perPage: query.perPage ?? 10,
+      },
+    });
+    return response.data;
+  },
+
+  async inviteMembers(payload: WorkspaceInviteMembersPayload): Promise<WorkspaceInviteMembersResponse> {
+    const response = await apiClient.post<WorkspaceInviteMembersResponse>('/invitations', payload);
+    return response.data;
+  },
+
+  async revokeInvitation(invitationId: string): Promise<SuccessResponse> {
+    const response = await apiClient.delete<SuccessResponse>(`/invitations/${invitationId}`);
+    return response.data;
+  },
+
+  async removeMember(memberId: string): Promise<SuccessResponse> {
+    const response = await apiClient.delete<SuccessResponse>(`/workspaces/current/members/${memberId}`);
+    return response.data;
+  },
+
+  async resetInviteCode(): Promise<Workspace> {
+    const response = await apiClient.post<Workspace>('/workspaces/current/invite-code/reset');
+    return response.data;
+  },
+
+  async acceptInvitation(token: string): Promise<AcceptInvitationResponse> {
+    const response = await apiClient.post<AcceptInvitationResponse>(`/invitations/accept/${token}`);
     return response.data;
   },
 };

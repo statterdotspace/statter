@@ -28,6 +28,9 @@ export class WorkspaceResponseDto {
   maxMonitors!: number;
 
   @Expose()
+  inviteCode!: string;
+
+  @Expose()
   membersCount!: number;
 
   @Expose()

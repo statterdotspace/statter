@@ -24,7 +24,8 @@
       "@/entities": ["./src/entities/index.ts"],
       "@/entities/*": ["./src/entities/*"],
       "@/features/*": ["./src/features/*"],
-      "@/widgets/*": ["./src/widgets/*"]
+      "@/widgets/*": ["./src/widgets/*"],
+      "@statter/database": ["../../libs/database/src/index.ts"]
     }
   },
   "include": [

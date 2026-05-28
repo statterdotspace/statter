@@ -9,7 +9,11 @@ import { toast } from 'sonner';
 import { AUTH_MESSAGES } from '../../shared/model/auth.constants';
 import { useAuthSuccessRedirect } from '../../shared/model/use-auth-success-redirect';
 
-const useSignUpForm = () => {
+interface UseSignUpFormParams {
+  redirectTarget?: string | null;
+}
+
+const useSignUpForm = ({ redirectTarget }: UseSignUpFormParams = {}) => {
   const { redirectAfterAuth } = useAuthSuccessRedirect();
   const [isPending, setIsPending] = useState(false);
   const [otpEmail, setOtpEmail] = useState<string | null>(null);
@@ -65,7 +69,7 @@ const useSignUpForm = () => {
 
       if (response.status === 'authenticated') {
         toast.success(AUTH_MESSAGES.OTP_VERIFIED);
-        await redirectAfterAuth();
+        await redirectAfterAuth(redirectTarget);
       }
     } catch (error) {
       toast.error(getErrorMessage(error));

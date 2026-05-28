@@ -9,7 +9,11 @@ import { toast } from 'sonner';
 import { AUTH_MESSAGES } from '../../shared/model/auth.constants';
 import { useAuthSuccessRedirect } from '../../shared/model/use-auth-success-redirect';
 
-const useSignInForm = () => {
+interface UseSignInFormParams {
+  redirectTarget?: string | null;
+}
+
+const useSignInForm = ({ redirectTarget }: UseSignInFormParams = {}) => {
   const { redirectAfterAuth } = useAuthSuccessRedirect();
   const [isPending, setIsPending] = useState(false);
   const [otpEmail, setOtpEmail] = useState<string | null>(null);
@@ -42,7 +46,7 @@ const useSignInForm = () => {
       }
 
       toast.success(AUTH_MESSAGES.LOGIN_SUCCESS);
-      await redirectAfterAuth();
+      await redirectAfterAuth(redirectTarget);
     } catch (error) {
       toast.error(getErrorMessage(error));
     } finally {
@@ -65,7 +69,7 @@ const useSignInForm = () => {
 
       if (response.status === 'authenticated') {
         toast.success(AUTH_MESSAGES.OTP_VERIFIED);
-        await redirectAfterAuth();
+        await redirectAfterAuth(redirectTarget);
       }
     } catch (error) {
       toast.error(getErrorMessage(error));

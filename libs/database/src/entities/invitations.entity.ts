@@ -34,7 +34,7 @@ export class InvitationOrm {
   email!: string;
 
   @Column({ name: 'invited_user_id', type: 'uuid', nullable: true })
-  invitedUserId?: string;
+  invitedUserId!: string | null;
 
   @ManyToOne(() => UserOrm, (user) => user.invitations, {
     nullable: true,
@@ -74,5 +74,5 @@ export class InvitationOrm {
   expiresAt!: Date;
 
   @Column({ name: 'responded_at', type: 'timestamptz', nullable: true })
-  respondedAt?: Date;
+  respondedAt!: Date | null;
 }
