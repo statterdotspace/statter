@@ -1,0 +1,46 @@
+# syntax=docker/dockerfile:1
+
+# ── install deps ────────────────────────────────────
+FROM node:22-slim AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm install
+
+# ── build app ────────────────────────────────────────────────────────────
+FROM deps AS builder
+WORKDIR /app
+
+ARG NEXT_PUBLIC_API_URL=http://localhost:4000/api
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV NEXT_TELEMETRY_DISABLED=1
+
+COPY . .
+RUN npx nx build web && npm prune --omit=dev
+
+# ── run prod image ─────────────────────────────────────────────────
+FROM node:22-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# node_modules resolves to /app/node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+
+# (npx nx build web → apps/web/dist/ because distDir: './dist')
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/next.config.js ./apps/web/next.config.js
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public         ./apps/web/public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/dist           ./apps/web/dist
+
+USER nextjs
+
+EXPOSE 3000
+
+# next start start w/ apps/web/ — because next.config.js with distDir: './dist' 
+WORKDIR /app/apps/web
+CMD ["/app/node_modules/.bin/next", "start", "-p", "3000"]

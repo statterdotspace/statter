@@ -1,5 +1,10 @@
-import { SignUpPageClient } from './page-client';
+import { Suspense } from 'react';
+import { SignUpPageClient } from './client';
 
 export default function SignUpPage() {
-  return <SignUpPageClient />;
+  return (
+    <Suspense>
+      <SignUpPageClient />;
+    </Suspense>
+  );
 }

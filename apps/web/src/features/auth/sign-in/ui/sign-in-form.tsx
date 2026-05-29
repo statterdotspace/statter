@@ -13,8 +13,16 @@ import { useSignInForm } from '../model/use-sign-in-form';
 const SignInForm = () => {
   const searchParams = useSearchParams();
   const redirectTarget = searchParams.get('redirect');
-  const { form, otpForm, isPending, isOtpStage, otpEmail, handleSubmit, handleOtpSubmit, resetOtpStage } =
-    useSignInForm({ redirectTarget });
+  const {
+    form,
+    otpForm,
+    isPending,
+    isOtpStage,
+    otpEmail,
+    handleSubmit,
+    handleOtpSubmit,
+    resetOtpStage,
+  } = useSignInForm({ redirectTarget });
 
   const googleAuthUrl = authApi.getGoogleAuthUrl();
   const githubAuthUrl = authApi.getGithubAuthUrl();
@@ -23,13 +31,20 @@ const SignInForm = () => {
     <div className="relative z-10 w-full max-w-sm">
       <AuthHeader
         title={isOtpStage ? 'Email verification' : 'Welcome Back'}
-        subtitle={isOtpStage ? `Enter the 6-digit code sent to ${otpEmail}` : 'Sign in to check your uptime'}
+        subtitle={
+          isOtpStage ? `Enter the 6-digit code sent to ${otpEmail}` : 'Sign in to check your uptime'
+        }
       />
 
       {!isOtpStage ? (
         <SignInCredentialsForm form={form} isPending={isPending} onSubmit={handleSubmit} />
       ) : (
-        <SignInOtpForm form={otpForm} isPending={isPending} onSubmit={handleOtpSubmit} onBack={resetOtpStage} />
+        <SignInOtpForm
+          form={otpForm}
+          isPending={isPending}
+          onSubmit={handleOtpSubmit}
+          onBack={resetOtpStage}
+        />
       )}
 
       {!isOtpStage ? (
@@ -39,7 +54,11 @@ const SignInForm = () => {
       <p className="mt-5 text-center text-sm text-neutral-600">
         Don&apos;t have an account?{' '}
         <Link
-          href={redirectTarget ? `${ROUTES.SIGN_UP}?redirect=${encodeURIComponent(redirectTarget)}` : ROUTES.SIGN_UP}
+          href={
+            redirectTarget
+              ? `${ROUTES.SIGN_UP}?redirect=${encodeURIComponent(redirectTarget)}`
+              : ROUTES.SIGN_UP
+          }
           className="font-medium text-primary"
         >
           Sign Up

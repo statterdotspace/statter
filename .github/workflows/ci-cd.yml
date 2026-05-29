@@ -1,0 +1,131 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+
+env:
+  NX_HEAD: ${{ github.sha }}
+  NODE_VERSION: 22
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set NX_BASE
+        run: |
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            echo "NX_BASE=HEAD~1" >> $GITHUB_ENV
+          else
+            echo "NX_BASE=${{ github.event.before }}" >> $GITHUB_ENV
+          fi
+
+      - name: Restore Nx cache
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: nx-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            nx-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+            nx-${{ runner.os }}-
+
+      - name: Lint affected projects
+        run: npm run affected:lint
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set NX_BASE
+        run: |
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            echo "NX_BASE=HEAD~1" >> $GITHUB_ENV
+          else
+            echo "NX_BASE=${{ github.event.before }}" >> $GITHUB_ENV
+          fi
+
+      - name: Restore Nx cache
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: nx-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            nx-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+            nx-${{ runner.os }}-
+
+      - name: Get affected apps
+        id: affected
+        run: |
+          APPS=$(npm run affected:apps --silent)
+          echo "apps=$APPS" >> $GITHUB_OUTPUT
+          echo "Affected apps: $APPS"
+
+      - name: Deploy api
+        if: contains(fromJSON(steps.affected.outputs.apps), 'api')
+        run: |
+          curl -sf -X POST \
+            "https://console.statter.space/api/application.deploy" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: ${{ secrets.DOKPLOY_API_KEY }}" \
+            -d "{\"applicationId\": \"${{ secrets.DOKPLOY_APP_ID_API }}\"}"
+          echo "api deployed successfully"
+
+      - name: Deploy web
+        if: contains(fromJSON(steps.affected.outputs.apps), 'web')
+        run: |
+          curl -sf -X POST \
+            "https://console.statter.space/api/application.deploy" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: ${{ secrets.DOKPLOY_API_KEY }}" \
+            -d "{\"applicationId\": \"${{ secrets.DOKPLOY_APP_ID_WEB }}\"}"
+          echo "web deployed successfully"
+
+      - name: Deploy scheduler
+        if: contains(fromJSON(steps.affected.outputs.apps), 'scheduler')
+        run: |
+          curl -sf -X POST \
+            "https://console.statter.space/api/application.deploy" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: ${{ secrets.DOKPLOY_API_KEY }}" \
+            -d "{\"applicationId\": \"${{ secrets.DOKPLOY_APP_ID_SCHEDULER }}\"}"
+          echo "scheduler deployed successfully"
+
+      - name: Deploy worker
+        if: contains(fromJSON(steps.affected.outputs.apps), 'worker')
+        run: |
+          curl -sf -X POST \
+            "https://console.statter.space/api/application.deploy" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: ${{ secrets.DOKPLOY_API_KEY }}" \
+            -d "{\"applicationId\": \"${{ secrets.DOKPLOY_APP_ID_WORKER }}\"}"
+          echo "worker deployed successfully"

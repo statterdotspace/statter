@@ -13,8 +13,16 @@ import { useSignUpForm } from '../model/use-sign-up-form';
 const SignUpForm = () => {
   const searchParams = useSearchParams();
   const redirectTarget = searchParams.get('redirect');
-  const { form, otpForm, isPending, isOtpStage, otpEmail, handleSubmit, handleOtpSubmit, resetOtpStage } =
-    useSignUpForm({ redirectTarget });
+  const {
+    form,
+    otpForm,
+    isPending,
+    isOtpStage,
+    otpEmail,
+    handleSubmit,
+    handleOtpSubmit,
+    resetOtpStage,
+  } = useSignUpForm({ redirectTarget });
 
   const googleAuthUrl = authApi.getGoogleAuthUrl();
   const githubAuthUrl = authApi.getGithubAuthUrl();
@@ -23,13 +31,20 @@ const SignUpForm = () => {
     <div className="relative z-10 w-full max-w-sm">
       <AuthHeader
         title={isOtpStage ? 'Verify your email' : 'Welcome!'}
-        subtitle={isOtpStage ? `Enter the 6-digit code sent to ${otpEmail}` : 'Sign up to check your uptime'}
+        subtitle={
+          isOtpStage ? `Enter the 6-digit code sent to ${otpEmail}` : 'Sign up to check your uptime'
+        }
       />
 
       {!isOtpStage ? (
         <SignUpCredentialsForm form={form} isPending={isPending} onSubmit={handleSubmit} />
       ) : (
-        <SignUpOtpForm form={otpForm} isPending={isPending} onSubmit={handleOtpSubmit} onBack={resetOtpStage} />
+        <SignUpOtpForm
+          form={otpForm}
+          isPending={isPending}
+          onSubmit={handleOtpSubmit}
+          onBack={resetOtpStage}
+        />
       )}
 
       {!isOtpStage ? (
@@ -40,7 +55,11 @@ const SignUpForm = () => {
         Already have an account?{' '}
         <Link
           className="font-medium text-primary"
-          href={redirectTarget ? `${ROUTES.SIGN_IN}?redirect=${encodeURIComponent(redirectTarget)}` : ROUTES.SIGN_IN}
+          href={
+            redirectTarget
+              ? `${ROUTES.SIGN_IN}?redirect=${encodeURIComponent(redirectTarget)}`
+              : ROUTES.SIGN_IN
+          }
         >
           Sign In
         </Link>

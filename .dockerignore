@@ -1,0 +1,29 @@
+node_modules/
+
+dist/
+apps/web/.next/
+
+# Nx
+.nx/
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/
+
+infra/docker/docker-compose.yml
+
+# IDE
+.idea/
+.vscode/
+*.local
+.DS_Store
+
+# Логи
+*.log
+npm-debug.log*
+
+coverage/
+tests/

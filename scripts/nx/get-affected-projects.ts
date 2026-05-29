@@ -11,7 +11,7 @@ export async function getAffectedProjects(
   if (!isSupportedProjectType(projectType)) {
     throw new Error(`Unsupported project type: ${projectType}`);
   }
-  const { stdout } = await execAsync(`nx show projects --type=${projectType}`);
+  const { stdout } = await execAsync(`nx show projects --type=${projectType} --affected`);
   return stdout;
 }
 

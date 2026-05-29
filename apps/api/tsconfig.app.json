@@ -7,7 +7,15 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "es2021",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@statter/config": ["../../libs/config/src/index.ts"],
+      "@statter/database": ["../../libs/database/src/index.ts"],
+      "@statter/rabbitmq": ["../../libs/rabbitmq/src/index.ts"],
+      "@statter/utils": ["../../libs/utils/src/index.ts"]
+    }
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "overrides.d.ts"],
 }
