@@ -6,7 +6,14 @@
     "api": "nx serve api",
     "web": "nx dev web",
     "docker:up": "docker compose -f ./infra/docker/docker-compose.yml up -w --build",
-    "docker:down": "docker compose -f ./infra/docker/docker-compose.yml down -v"
+    "docker:down": "docker compose -f ./infra/docker/docker-compose.yml down -v",
+    "affected:apps": "npx ts-node --project scripts/tsconfig.json scripts/nx/get-affected-projects-cli.ts --type=app",
+    "affected:libs": "npx ts-node --project scripts/tsconfig.json scripts/nx/get-affected-projects-cli.ts --type=lib",
+    "affected:graph": "nx graph --affected",
+    "get:apps": "npx ts-node --project scripts/tsconfig.json scripts/nx/get-projects-cli.ts -t app -p",
+    "get:libs": "npx ts-node --project scripts/tsconfig.json scripts/nx/get-projects-cli.ts -t lib -p",
+    "get:deps": "npx ts-node --project scripts/tsconfig.json scripts/nx/get-dependencies-cli.ts",
+    "affected:lint": "ts-node --project scripts/tsconfig.json scripts/nx/lint.ts -v"
   },
   "private": true,
   "dependencies": {
