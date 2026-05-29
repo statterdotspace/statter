@@ -6,7 +6,7 @@
     "api": "nx serve api",
     "web": "nx dev web",
     "docker:up": "docker compose -f ./infra/docker/docker-compose.yml up -w --build",
-    "docker:down": "docker compose -f ./infra/docker/docker-compose.yml down"
+    "docker:down": "docker compose -f ./infra/docker/docker-compose.yml down -v"
   },
   "private": true,
   "dependencies": {

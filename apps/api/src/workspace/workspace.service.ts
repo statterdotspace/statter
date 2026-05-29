@@ -50,7 +50,7 @@ export class WorkspaceService {
     return await this.workspaceMemberRepo.count({ where: { userId } });
   }
 
-  async findWorkspacesByUserId(userId: string) {
+  async findByUserId(userId: string) {
     return await this.workspaceRepo
       .createQueryBuilder('workspace')
       .innerJoin('workspace_members', 'member', 'member.workspace_id = workspace.id')
@@ -58,5 +58,14 @@ export class WorkspaceService {
       .loadRelationCountAndMap('workspace.membersCount', 'workspace.members')
       .orderBy('workspace.created_at', 'DESC')
       .getMany();
+  }
+
+  async findFirstByUserId(userId: string) {
+    return await this.workspaceRepo
+      .createQueryBuilder('workspace')
+      .innerJoin('workspace_members', 'member', 'member.workspace_id = workspace.id')
+      .where('member.user_id = :userId', { userId })
+      .orderBy('workspace.created_at', 'ASC')
+      .getOne();
   }
 }

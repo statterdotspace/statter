@@ -52,16 +52,15 @@ export class HttpsCheckerService implements Checker {
     }
   }
 
-  private detectResponseSize(
-    data: ArrayBuffer,
-    headers: Record<string, unknown>
-  ): number | null {
+  private detectResponseSize(data: ArrayBuffer, headers: Record<string, unknown>): number | null {
     const contentLength = headers['content-length'];
-    if (typeof contentLength === 'string') {
-      const parsed = Number(contentLength);
-      if (Number.isFinite(parsed) && parsed >= 0) {
-        return parsed;
-      }
+    if (!contentLength || typeof contentLength !== 'string') {
+      return null;
+    }
+    const parsed = Number(contentLength);
+
+    if (Number.isFinite(parsed) && parsed >= 0) {
+      return parsed;
     }
 
     return data.byteLength;

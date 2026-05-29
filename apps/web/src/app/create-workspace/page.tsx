@@ -8,6 +8,7 @@ export default async function CreateWorkspacePage() {
   try {
     await workspaceApi.list();
   } catch (error) {
+    console.log('Error fetching workspaces:', error);
     if (error instanceof AxiosError && error.response?.status === 401) {
       redirect(ROUTES.SIGN_IN);
     }

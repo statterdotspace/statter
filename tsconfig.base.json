@@ -16,7 +16,8 @@
     "paths": {
       "@statter/database": ["./libs/database/src/index.ts"],
       "@statter/config": ["./libs/config/src/index.ts"],
-      "@statter/utils": ["./libs/utils/src/index.ts"]
+      "@statter/utils": ["./libs/utils/src/index.ts"],
+      "@statter/rabbitmq": ["./libs/rabbitmq/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

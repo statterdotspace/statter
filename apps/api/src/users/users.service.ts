@@ -53,4 +53,14 @@ export class UsersService {
   async update(id: string, params: UpdateUserParams) {
     return this.usersRepo.save({ ...params, id });
   }
+
+  async upsert(params: CreateUserParams) {
+    const existingUser = await this.findByEmail(params.email);
+
+    if (existingUser) {
+      return await this.usersRepo.save({ ...params, id: existingUser.id });
+    }
+
+    return await this.usersRepo.save(params);
+  }
 }

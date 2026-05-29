@@ -46,7 +46,7 @@ export class WorkspaceController {
 
   @Get()
   async list(@CurrentUser() user: UserOrm) {
-    const workspaces = await this.workspaceService.findWorkspacesByUserId(user.id);
+    const workspaces = await this.workspaceService.findByUserId(user.id);
     return workspaces.map((workspace) => toDto(WorkspaceResponseDto, workspace));
   }
 

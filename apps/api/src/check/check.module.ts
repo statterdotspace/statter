@@ -5,8 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CheckOrm, MonitorOrm } from '@statter/database';
 import { WorkspaceModule } from '../workspace/workspace.module';
 import { MonitorModule } from '../monitor/monitor.module';
-import { CheckInternalController } from './check-internal.controller';
-import { InternalApiKeyGuard } from './guards/internal-api-key.guard';
+import { RabbitMqModule } from '@statter/rabbitmq';
 import { CheckGateway } from './check.gateway';
 import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
@@ -14,7 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { WsJwtAuthGuard } from './guards/ws-jwt-auth.guard';
 import { WsExceptionFilter } from '../core/filters/ws-exception.filter';
 import { CheckResultListener } from './listeners/check-result.listener';
-import { CheckResultMonitorExistsGuard } from './guards/check-result-monitor-exists.guard';
+import { CheckResultConsumerService } from './check-result-consumer.service';
 
 @Module({
   imports: [
@@ -22,6 +21,7 @@ import { CheckResultMonitorExistsGuard } from './guards/check-result-monitor-exi
     WorkspaceModule,
     MonitorModule,
     UsersModule,
+    RabbitMqModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
@@ -29,11 +29,10 @@ import { CheckResultMonitorExistsGuard } from './guards/check-result-monitor-exi
       }),
     }),
   ],
-  controllers: [CheckController, CheckInternalController],
+  controllers: [CheckController],
   providers: [
     CheckService,
-    InternalApiKeyGuard,
-    CheckResultMonitorExistsGuard,
+    CheckResultConsumerService,
     WsJwtAuthGuard,
     WsExceptionFilter,
     CheckGateway,

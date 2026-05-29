@@ -25,3 +25,12 @@ export interface CheckResultPayload {
 }
 
 export const getChecksQueueName = (region: string): string => `checks_${region}`;
+
+export const CHECK_RESULTS_EXCHANGE_DEFAULT = 'check_results';
+export const getCheckResultsQueueName = (region: string): string => `check_results_${region}`;
+
+export const getChecksDlxName = (): string => 'checks.dlx';
+export const getChecksDlqName = (region: string): string => `checks_${region}.dlq`;
+
+export const getCheckResultsDlxName = (): string => 'check_results.dlx';
+export const getCheckResultsDlqName = (region: string): string => `check_results_${region}.dlq`;

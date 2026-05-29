@@ -3,8 +3,8 @@ import { CheckJobPayload, CheckResultPayload } from '@statter/utils';
 import { CheckerRegistryService } from './checkers/checker-registry.service';
 
 @Injectable()
-export class CheckExecutionService {
-  private readonly logger = new Logger(CheckExecutionService.name);
+export class ExecutionService {
+  private readonly logger = new Logger(ExecutionService.name);
 
   constructor(private readonly checkerRegistryService: CheckerRegistryService) {}
 

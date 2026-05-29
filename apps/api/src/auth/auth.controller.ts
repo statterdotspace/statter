@@ -32,6 +32,8 @@ import { UserNotVerifiedGuard } from './guards/user-not-verified.guard';
 
 @Controller('auth')
 export class AuthController {
+  frontendUrl!: string;
+
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
@@ -39,7 +41,9 @@ export class AuthController {
     private readonly verificationCodeService: VerificationCodeService,
     private readonly configService: ConfigService,
     private readonly eventEmitter: EventEmitter2
-  ) {}
+  ) {
+    this.frontendUrl = this.configService.getOrThrow<string>('app.frontendUrl');
+  }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -174,7 +178,7 @@ export class AuthController {
 
   private async completeOAuthCallback(response: Response, profile: OAuthProfile) {
     try {
-      const user = await this.upsertOAuthUser(profile);
+      const user = await this.usersService.upsert({ ...profile, verifiedAt: new Date() });
       const tokens = await this.authService.issueTokens({ sub: user.id, role: user.role });
       setTokensCookies(response, tokens);
       const redirectUrl = await this.getFrontendWorkspaceUrl(user.id);
@@ -182,43 +186,18 @@ export class AuthController {
       return response.redirect(redirectUrl);
     } catch {
       clearTokensCookies(response);
-      return response.redirect(this.getFrontendErrorUrl());
+      return response.redirect(
+        new URL(`${AUTH_ROUTES.SIGN_IN}?error=oauth`, this.frontendUrl).toString()
+      );
     }
-  }
-
-  private getFrontendUrl(): string {
-    return this.configService.get<string>('app.frontendUrl') ?? 'http://localhost:3000';
-  }
-
-  private getFrontendErrorUrl(): string {
-    return new URL('/sign-in?error=oauth', this.getFrontendUrl()).toString();
   }
 
   private async getFrontendWorkspaceUrl(userId: string): Promise<string> {
-    const frontendUrl = this.getFrontendUrl();
-    const workspaces = await this.workspaceService.findWorkspacesByUserId(userId);
-    const firstWorkspace = workspaces[0];
-
-    if (!firstWorkspace?.slug) {
-      return new URL(AUTH_ROUTES.CREATE_WORKSPACE, frontendUrl).toString();
+    const first = await this.workspaceService.findFirstByUserId(userId);
+    if (!first?.slug) {
+      return new URL(AUTH_ROUTES.CREATE_WORKSPACE, this.frontendUrl).toString();
     }
-
-    return new URL(`/${firstWorkspace.slug}`, frontendUrl).toString();
-  }
-
-  private async upsertOAuthUser(profile: OAuthProfile): Promise<UserOrm> {
-    const existingUser = await this.usersService.findByEmail(profile.email);
-    if (existingUser) {
-      const updatedUser = await this.usersService.update(existingUser.id, { ...profile });
-
-      if (!updatedUser) {
-        throw new UnauthorizedException('OAuth user update failed');
-      }
-
-      return updatedUser;
-    }
-
-    return await this.usersService.create({ ...profile });
+    return new URL(`/${first.slug}`, this.frontendUrl).toString();
   }
 
   private async setAuthCookies(response: Response, user: UserOrm) {

@@ -6,7 +6,6 @@ import appConfig from './server/app.config';
 import storageConfig from './server/storage.config';
 import mailConfig from './server/mail.config';
 import rabbitmqConfig from './server/rabbitmq.config';
-import internalConfig from './server/internal.config';
 
 export const serverConfig = [
   databaseConfig,
@@ -17,7 +16,17 @@ export const serverConfig = [
   storageConfig,
   mailConfig,
   rabbitmqConfig,
-  internalConfig,
 ];
+
+export {
+  databaseConfig,
+  redisConfig,
+  oauthConfig,
+  authConfig,
+  appConfig,
+  storageConfig,
+  mailConfig,
+  rabbitmqConfig,
+};
 
 export * from './server/types';

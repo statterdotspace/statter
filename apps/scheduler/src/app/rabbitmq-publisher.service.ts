@@ -1,40 +1,25 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  CHECKS_EXCHANGE_DEFAULT,
-  CheckJobPayload,
-  getChecksQueueName,
-} from '@statter/utils';
-import * as amqp from 'amqplib';
+import { CheckJobPayload, getChecksQueueName } from '@statter/utils';
+import { BaseRabbitMqPublisher, RabbitMqConnectionService } from '@statter/rabbitmq';
 
 @Injectable()
-export class RabbitMqPublisherService implements OnModuleInit, OnModuleDestroy {
+export class RabbitMqPublisherService extends BaseRabbitMqPublisher {
   private readonly logger = new Logger(RabbitMqPublisherService.name);
-  private connection: amqp.ChannelModel | null = null;
-  private channel: amqp.Channel | null = null;
-  private exchangeName = CHECKS_EXCHANGE_DEFAULT;
+  private exchangeName!: string;
   private readonly assertedRegions = new Set<string>();
 
-  constructor(private readonly configService: ConfigService) {}
-
-  async onModuleInit(): Promise<void> {
-    this.exchangeName =
-      this.configService.get<string>('rabbitmq.checksExchange') ?? CHECKS_EXCHANGE_DEFAULT;
-
-    const rabbitMqUrl =
-      this.configService.get<string>('rabbitmq.url') ?? 'amqp://admin:admin@localhost:5672';
-
-    this.connection = await amqp.connect(rabbitMqUrl);
-    this.channel = await this.connection.createChannel();
-
-    await this.channel.assertExchange(this.exchangeName, 'direct', { durable: true });
-
-    this.logger.log(`RabbitMQ publisher connected (exchange="${this.exchangeName}")`);
+  constructor(
+    rabbitMqConnection: RabbitMqConnectionService,
+    private readonly configService: ConfigService
+  ) {
+    super(rabbitMqConnection);
   }
 
-  async onModuleDestroy(): Promise<void> {
-    await this.channel?.close();
-    await this.connection?.close();
+  protected async setup(): Promise<void> {
+    this.exchangeName = this.configService.getOrThrow('rabbitmq.checksExchange');
+    await this.channel.assertExchange(this.exchangeName, 'direct', { durable: true });
+    this.logger.log(`RabbitMQ publisher connected (exchange="${this.exchangeName}")`);
   }
 
   async publishCheckJob(job: CheckJobPayload): Promise<void> {
@@ -59,11 +44,7 @@ export class RabbitMqPublisherService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async assertRegionalQueue(region: string): Promise<void> {
-    if (!this.channel) {
-      return;
-    }
-
-    if (this.assertedRegions.has(region)) {
+    if (!this.channel || this.assertedRegions.has(region)) {
       return;
     }
 
