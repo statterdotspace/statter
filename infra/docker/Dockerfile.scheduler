@@ -19,8 +19,10 @@ RUN npx nx run scheduler:prune
 FROM node:22-alpine AS runner
 WORKDIR /app
 
-COPY --from=builder /app/dist/apps/scheduler ./
+COPY --from=builder --chown=node:node /app/dist/apps/scheduler ./
 
 RUN npm ci --omit=dev
+
+USER node
 
 CMD ["node", "main.js"]
