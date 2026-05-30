@@ -9,10 +9,13 @@ RUN npm install
 
 # ── build app ───────────────────────────────────────────────────────────
 FROM deps AS builder
+ENV NX_DAEMON=false
 
 COPY . .
 
-RUN npx nx build api && npm prune --omit=dev
+RUN npx nx build api \
+  && test -d /app/dist/apps/api \
+  && npm prune --omit=dev
 
 # ── run prod image ─────────────────────────────────────────────────
 FROM node:22-alpine AS runner
