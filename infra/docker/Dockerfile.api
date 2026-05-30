@@ -1,37 +1,16 @@
-# syntax=docker/dockerfile:1
+FROM docker.io/node:lts-alpine
 
-# ── install deps ────────────────────────────────────
-FROM node:22-alpine AS deps
+ENV HOST=0.0.0.0
+ENV PORT=4000
+
 WORKDIR /app
-
-COPY package.json package-lock.json ./
-RUN npm ci --include=optional
-
-# ── build app ───────────────────────────────────────────────────────────
-FROM deps AS builder
-ENV NX_DAEMON=false
 
 COPY . .
 
-RUN NX_VERSION="$(node -p "require('./node_modules/nx/package.json').version")" \
-  && case "$(uname -m)" in \
-    x86_64) NX_PKG='@nx/nx-linux-x64-musl' ;; \
-    aarch64|arm64) NX_PKG='@nx/nx-linux-arm64-musl' ;; \
-    *) echo "Unsupported architecture: $(uname -m)"; exit 1 ;; \
-  esac \
-  && npm install --no-save "${NX_PKG}@${NX_VERSION}" \
-  && npx nx build api \
-  && test -d /app/dist/apps/api \
-  && npm prune --omit=dev
-
-# ── run prod image ─────────────────────────────────────────────────
-FROM node:22-alpine AS runner
-WORKDIR /app
-
-COPY --from=builder --chown=node:node /app/dist/apps/api ./
-RUN npm install --omit=dev
+RUN npm --omit=dev -f install && ls -la
 
 USER node
 
 EXPOSE 4000
-CMD ["node", "main.js"]
+
+CMD [ "node", "main.js" ]
