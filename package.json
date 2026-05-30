@@ -113,7 +113,7 @@
     "eslint-plugin-react": "7.35.0",
     "eslint-plugin-react-hooks": "5.0.0",
     "jsonc-eslint-parser": "^2.1.0",
-    "nx": "22.7.0",
+    "nx": "^22.7.0",
     "postcss": "^8.4.38",
     "prettier": "~3.6.2",
     "rollup": "^4.14.0",

@@ -1,26 +1,25 @@
 # syntax=docker/dockerfile:1
 
 # ── install deps ────────────────────────────────────
-FROM node:22-slim AS deps
+FROM node:22-alpine AS deps
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm install
 
 # ── build app ───────────────────────────────────────────────────────────
 FROM deps AS builder
 
 COPY . .
 
-RUN npx nx build api
-RUN npx nx run api:prune
+RUN npx nx build api && npm prune --omit=dev
 
 # ── run prod image ─────────────────────────────────────────────────
-FROM node:22-slim AS runner
+FROM node:22-alpine AS runner
 WORKDIR /app
 
 COPY --from=builder --chown=node:node /app/dist/apps/api ./
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
 
 USER node
 
