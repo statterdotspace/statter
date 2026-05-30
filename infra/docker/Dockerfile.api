@@ -5,7 +5,7 @@ FROM node:22-alpine AS deps
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm ci --include=optional
 
 # ── build app ───────────────────────────────────────────────────────────
 FROM deps AS builder
@@ -13,7 +13,14 @@ ENV NX_DAEMON=false
 
 COPY . .
 
-RUN npx nx build api \
+RUN NX_VERSION="$(node -p "require('./node_modules/nx/package.json').version")" \
+  && case "$(uname -m)" in \
+    x86_64) NX_PKG='@nx/nx-linux-x64-musl' ;; \
+    aarch64|arm64) NX_PKG='@nx/nx-linux-arm64-musl' ;; \
+    *) echo "Unsupported architecture: $(uname -m)"; exit 1 ;; \
+  esac \
+  && npm install --no-save "${NX_PKG}@${NX_VERSION}" \
+  && npx nx build api \
   && test -d /app/dist/apps/api \
   && npm prune --omit=dev
 
