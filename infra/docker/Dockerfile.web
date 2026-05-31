@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1
 
 # ── install deps ────────────────────────────────────
-FROM node:22-slim AS deps
+FROM node:20-slim AS deps
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm install
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
 
 # ── build app ────────────────────────────────────────────────────────────
 FROM deps AS builder
@@ -15,10 +15,10 @@ ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
 
 COPY . .
-RUN npx nx build web && npm prune --omit=dev
+RUN yarn nx build web && yarn install --production --frozen-lockfile
 
 # ── run prod image ─────────────────────────────────────────────────
-FROM node:22-alpine AS runner
+FROM node:20-alpine AS runner
 WORKDIR /app
 
 RUN addgroup --system --gid 1001 nodejs && \
@@ -27,7 +27,7 @@ RUN addgroup --system --gid 1001 nodejs && \
 # node_modules resolves to /app/node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
-# (npx nx build web → apps/web/dist/ because distDir: './dist')
+# (yarn nx build web → apps/web/dist/ because distDir: './dist')
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/next.config.js ./apps/web/next.config.js
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public         ./apps/web/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/dist           ./apps/web/dist
@@ -36,6 +36,6 @@ USER nextjs
 
 EXPOSE 4001
 
-# next start start w/ apps/web/ — because next.config.js with distDir: './dist' 
+# next start w/ apps/web/ — because next.config.js with distDir: './dist'
 WORKDIR /app/apps/web
 CMD ["/app/node_modules/.bin/next", "start", "-p", "3000"]
