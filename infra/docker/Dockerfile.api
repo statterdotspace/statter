@@ -1,32 +1,32 @@
 # syntax=docker/dockerfile:1
 
-FROM node:lts-alpine AS deps
+# ── install deps ────────────────────────────────────
+FROM node:20-slim AS deps
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
 
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+# ── build app ───────────────────────────────────────
 FROM deps AS builder
-ENV NX_DAEMON=false
 WORKDIR /app
+
+ENV NX_DAEMON=false
+
 COPY . .
 
-RUN NX_VERSION="$(node -p "require('./node_modules/nx/package.json').version")" \
-  && RSPACK_VERSION="$(node -p "require('./node_modules/@rspack/binding/package.json').version")" \
-  && case "$(uname -m)" in \
-    x86_64)   NX_PKG='@nx/nx-linux-x64-musl';   RSPACK_PKG='@rspack/binding-linux-x64-musl' ;; \
-    aarch64|arm64) NX_PKG='@nx/nx-linux-arm64-musl'; RSPACK_PKG='@rspack/binding-linux-arm64-musl' ;; \
-    *) echo "Unsupported arch: $(uname -m)"; exit 1 ;; \
-  esac \
-  && npm install --no-save "${NX_PKG}@${NX_VERSION}" "${RSPACK_PKG}@${RSPACK_VERSION}" \
-  && npx nx run api:build \
-  && npx nx run api:prune
+RUN yarn nx build api
 
-FROM node:lts-alpine AS runner
+# ── run prod image ──────────────────────────────────
+FROM node:20-slim AS runner
 WORKDIR /app
+
 COPY --from=builder --chown=node:node /app/dist/apps/api ./
-RUN npm install --production
-RUN npm install reflect-metadata tslib rxjs @nestjs/platform-express
+
+RUN yarn install --production --frozen-lockfile
+
 USER node
-ENV PORT=4000
-EXPOSE ${PORT}
-CMD ["node", "./main.js"]
+
+EXPOSE 4000
+
+CMD ["node", "main.js"]

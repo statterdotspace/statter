@@ -1,28 +1,29 @@
 # syntax=docker/dockerfile:1
 
 # ── install deps ────────────────────────────────────
-FROM node:22-slim AS deps
+FROM node:20-slim AS deps
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci --include=optional
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
 
-# ── build app ───────────────────────────────────────────────────────────
+# ── build app ───────────────────────────────────────
 FROM deps AS builder
+WORKDIR /app
+
 ENV NX_DAEMON=false
 
 COPY . .
 
-RUN npx nx build worker
-RUN npx nx run worker:prune
+RUN yarn nx build worker
 
-# ── run prod image ─────────────────────────────────────────────────
-FROM node:22-slim AS runner
+# ── run prod image ──────────────────────────────────
+FROM node:20-slim AS runner
 WORKDIR /app
 
 COPY --from=builder --chown=node:node /app/dist/apps/worker ./
 
-RUN npm ci --omit=dev
+RUN yarn install --production --frozen-lockfile
 
 USER node
 

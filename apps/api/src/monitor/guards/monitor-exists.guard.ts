@@ -16,7 +16,7 @@ export class MonitorExistsGuard implements CanActivate {
     const monitorId = request.params?.['monitorId'];
     const workspaceId = request.workspace?.id ?? request.workspaceId;
 
-    if (!monitorId || !workspaceId) {
+    if (!monitorId || typeof monitorId !== 'string' || !workspaceId) {
       return true;
     }
 

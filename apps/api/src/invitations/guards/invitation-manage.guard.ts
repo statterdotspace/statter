@@ -24,7 +24,7 @@ export class InvitationManageGuard implements CanActivate {
     const invitationId = request.params?.['invitationId'];
     const workspaceId = request.workspace?.id ?? request.workspaceId;
 
-    if (!invitationId || !workspaceId) {
+    if (!invitationId || typeof invitationId !== 'string' || !workspaceId) {
       return true;
     }
 

@@ -16,7 +16,7 @@ export class ProjectExistsGuard implements CanActivate {
     const projectId = request.params?.['projectId'];
     const workspaceId = request.workspace?.id ?? request.workspaceId;
 
-    if (!projectId || !workspaceId) {
+    if (!projectId || typeof projectId !== 'string' || !workspaceId) {
       return true;
     }
 

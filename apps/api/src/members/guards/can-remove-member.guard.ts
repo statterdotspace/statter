@@ -24,7 +24,7 @@ export class RemovableMemberGuard implements CanActivate {
     const memberId = request.params?.['memberId'];
     const workspaceId = request.workspace?.id ?? request.workspaceId;
 
-    if (!memberId || !workspaceId) {
+    if (!memberId || typeof memberId !== 'string' || !workspaceId) {
       return true;
     }
 
