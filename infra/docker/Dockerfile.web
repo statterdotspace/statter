@@ -38,4 +38,4 @@ EXPOSE 4001
 
 # next start w/ apps/web/ — because next.config.js with distDir: './dist'
 WORKDIR /app/apps/web
-CMD ["/app/node_modules/.bin/next", "start", "-p", "3000"]
+CMD ["/app/node_modules/.bin/next", "start", "-p", "4001"]
