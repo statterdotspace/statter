@@ -4,6 +4,7 @@ import { ITokens } from '../types/cookies.types';
 import { durationToMs } from './parse-duration-to-ms';
 
 const isSecureCookie = process.env['NODE_ENV'] === 'production';
+const COOKIE_DOMAIN = process.env['COOKIE_DOMAIN'] || undefined;
 
 const setRefreshTokenCookie = (response: Response, refreshToken: string): void => {
   response.cookie(TOKEN_NAME.REFRESH_TOKEN, refreshToken, {
@@ -11,6 +12,7 @@ const setRefreshTokenCookie = (response: Response, refreshToken: string): void =
     secure: isSecureCookie,
     sameSite: 'lax',
     path: '/',
+    domain: COOKIE_DOMAIN,
     expires: new Date(Date.now() + durationToMs(TOKEN_TTL.REFRESH_TOKEN)),
   });
 };
@@ -21,6 +23,7 @@ const setAccessTokenCookie = (response: Response, accessToken: string): void => 
     secure: isSecureCookie,
     sameSite: 'lax',
     path: '/',
+    domain: COOKIE_DOMAIN,
     expires: new Date(Date.now() + durationToMs(TOKEN_TTL.ACCESS_TOKEN)),
   });
 };
@@ -31,6 +34,7 @@ const clearRefreshTokenCookie = (response: Response): void => {
     secure: isSecureCookie,
     sameSite: 'lax',
     path: '/',
+    domain: COOKIE_DOMAIN,
   });
 };
 
@@ -40,6 +44,7 @@ const clearAccessTokenCookie = (response: Response): void => {
     secure: isSecureCookie,
     sameSite: 'lax',
     path: '/',
+    domain: COOKIE_DOMAIN,
   });
 };
 
