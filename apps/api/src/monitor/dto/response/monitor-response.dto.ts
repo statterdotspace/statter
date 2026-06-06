@@ -61,4 +61,7 @@ export class MonitorResponseDto {
   @Expose()
   @Type(() => CheckResponseDto)
   lastCheck!: CheckResponseDto | null;
+
+  @Expose()
+  uptime30dPct!: number | null;
 }

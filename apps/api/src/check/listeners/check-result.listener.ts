@@ -1,19 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { CheckStatus } from '@statter/database';
 import { CheckGateway } from '../check.gateway';
 import {
   CHECK_RESULT_INGESTED_EVENT,
   CheckResultIngestedEvent,
 } from '../events/check-result-ingested.event';
-import { CheckService } from '../check.service';
 
 @Injectable()
 export class CheckResultListener {
-  constructor(
-    private readonly checkGateway: CheckGateway,
-    private readonly checkService: CheckService
-  ) {}
+  constructor(private readonly checkGateway: CheckGateway) {}
 
   @OnEvent(CHECK_RESULT_INGESTED_EVENT)
   handleCheckResultIngested(event: CheckResultIngestedEvent): void {
@@ -23,9 +18,5 @@ export class CheckResultListener {
       check: event.check,
       monitor: event.monitor,
     });
-
-    if (event.check.status !== CheckStatus.UP) {
-      this.checkService.logFailure(event.monitorEntity, event.check);
-    }
   }
 }

@@ -68,6 +68,7 @@ export class MonitorDispatchService implements OnModuleInit {
               region: monitor.region,
               timeoutMs: monitor.timeoutMs,
               expectedStatus: monitor.expectedStatus,
+              degradedThresholdMs: monitor.degradedThresholdMs ?? null,
               queuedAt: now.toISOString(),
             };
 

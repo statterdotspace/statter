@@ -5,7 +5,7 @@ import { useSettings } from '@/entities/workspace';
 import { useWorkspaceLogoUpload, useWorkspaceSettingsForm } from '@/features/workspace';
 import { workspaceApi } from '@/shared/api';
 import { ROUTES, WORKSPACE_COOKIE_NAME } from '@/shared/config';
-import { PageContainer, PageContent, PageHeader, PageTitle } from '@/shared/ui/page-wrapper';
+import { PageContainer, PageContent } from '@/shared/ui/page-wrapper';
 import { WorkspaceGeneralSettings } from '@/widgets/settings';
 
 const SettingsPageClient = () => {
@@ -69,9 +69,6 @@ const SettingsPageClient = () => {
 
   return (
     <PageContainer>
-      <PageHeader>
-        <PageTitle>Settings</PageTitle>
-      </PageHeader>
       <PageContent>
         <WorkspaceGeneralSettings
           workspaceName={workspaceSettings.workspaceName}

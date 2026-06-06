@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getErrorMessage, workspaceApi } from '@/shared/api';
-import { PageContainer, PageContent, PageHeader, PageTitle } from '@/shared/ui/page-wrapper';
+import { PageContainer, PageContent } from '@/shared/ui/page-wrapper';
 import { CopyInviteLink, InviteMembersDialog, WorkspaceMembersSettings } from '@/widgets/settings';
 import { toast } from 'sonner';
 
@@ -72,15 +72,14 @@ const SettingsMembersPageClient = () => {
 
   return (
     <PageContainer>
-      <PageHeader>
-        <PageTitle>Members</PageTitle>
-        <div className="flex items-center gap-2">
-          <InviteMembersDialog onInvited={refreshMembers} />
-          <CopyInviteLink />
-        </div>
-      </PageHeader>
-
       <PageContent>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="font-semibold">Members</h3>
+          <div className="flex items-center gap-2">
+            <InviteMembersDialog onInvited={refreshMembers} />
+            <CopyInviteLink />
+          </div>
+        </div>
         <WorkspaceMembersSettings
           rows={membersQuery.data?.data ?? []}
           meta={membersQuery.data?.meta}

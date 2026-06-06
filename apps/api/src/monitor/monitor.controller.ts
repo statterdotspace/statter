@@ -113,13 +113,17 @@ export class MonitorController {
       region: query.region,
     });
 
-    const lastCheckByMonitorId = await this.monitorService.findLatestChecksByMonitorIds(
-      monitors.data.map((monitor) => monitor.id)
-    );
+    const monitorIds = monitors.data.map((monitor) => monitor.id);
+
+    const [lastCheckByMonitorId, uptime30dByMonitorId] = await Promise.all([
+      this.monitorService.findLatestChecksByMonitorIds(monitorIds),
+      this.monitorService.getUptime30dBatch(monitorIds),
+    ]);
 
     const data = monitors.data.map((monitor) => ({
       ...monitor,
       lastCheck: lastCheckByMonitorId.get(monitor.id) ?? null,
+      uptime30dPct: uptime30dByMonitorId.get(monitor.id) ?? null,
     }));
 
     return toPaginatedDto(MonitorResponseDto, {

@@ -125,7 +125,7 @@ const CopyInviteLink = () => {
               onClick={handleCopyInviteLink}
               disabled={isLoading || isCopying}
             >
-              {isCopying ? <Loader2 className="size-4 animate-spin" /> : <Copy className="size-4" />}
+              <Copy className="size-4" />
             </Button>
           </div>
 

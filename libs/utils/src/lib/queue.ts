@@ -10,6 +10,7 @@ export interface CheckJobPayload {
   region: string;
   timeoutMs: number;
   expectedStatus: number;
+  degradedThresholdMs: number | null;
   queuedAt: string;
 }
 

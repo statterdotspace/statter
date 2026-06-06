@@ -13,10 +13,11 @@ type Props = {
   title?: string;
   links: LinkItem[];
   activePath: string;
+  matchExact?: boolean;
 };
 
 const NavSection = React.memo(
-  function NavSection({ title, links, activePath }: Props) {
+  function NavSection({ title, links, activePath, matchExact = false }: Props) {
     return (
       <div>
         {title ? (
@@ -31,7 +32,11 @@ const NavSection = React.memo(
               name={link.name}
               path={link.path}
               Icon={link.icon}
-              isActive={activePath === link.path}
+              isActive={
+                matchExact
+                  ? activePath === link.path
+                  : activePath === link.path || activePath.startsWith(link.path + '/')
+              }
             />
           ))}
         </ul>

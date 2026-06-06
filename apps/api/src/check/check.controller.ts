@@ -9,6 +9,7 @@ import { WorkspaceHeaderGuard } from '../workspace/guards/workspace-header.guard
 import { WorkspaceMemberGuard } from '../workspace/guards/workspace-member.guard';
 import { CheckHistoryQueryDto } from './dto/request/check-history-query.dto';
 import { ListChecksQueryDto } from './dto/request/list-checks-query.dto';
+import { MonitorStatsQueryDto } from './dto/request/monitor-stats-query.dto';
 import { CheckResponseDto } from './dto/response/check-response.dto';
 import { CheckService } from './check.service';
 
@@ -53,5 +54,14 @@ export class CheckController {
     const checks = await this.checkService.findRecentByMonitorId(monitor.id, days, limit);
 
     return checks.map((check) => toDto(CheckResponseDto, check));
+  }
+
+  @Get('stats')
+  async stats(
+    @Param('monitorId', ParseUUIDPipe) _monitorId: string,
+    @CurrentMonitor() monitor: MonitorOrm,
+    @Query() query: MonitorStatsQueryDto
+  ) {
+    return this.checkService.getStats(monitor.id, query.period ?? '24h');
   }
 }

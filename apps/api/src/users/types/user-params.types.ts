@@ -21,4 +21,5 @@ export interface UpdateUserParams {
   avatarUrl?: string | null;
   verifiedAt?: Date | null;
   isTwoFactorEnabled?: boolean;
+  passwordHash?: string | null;
 }

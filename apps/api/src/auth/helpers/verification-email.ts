@@ -3,6 +3,7 @@ import { VERIFICATION_TEXT, VerificationType } from '../constants/verification.c
 const verificationTitleByType: Record<VerificationType, string> = {
   [VerificationType.EMAIL]: 'Email verification',
   [VerificationType.LOGIN_TWO_FACTOR]: 'Two-factor login verification',
+  [VerificationType.CHANGE_PASSWORD]: 'Password change verification',
 };
 
 const buildVerificationEmail = (code: string, verificationType: VerificationType) => {

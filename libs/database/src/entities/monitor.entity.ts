@@ -96,6 +96,9 @@ export class MonitorOrm {
   @Column({ name: 'last_queued_at', type: 'timestamptz', nullable: true })
   lastQueuedAt?: Date | null;
 
+  @Column({ name: 'degraded_threshold_ms', type: 'int', nullable: true, default: null })
+  degradedThresholdMs!: number | null;
+
   @OneToMany(() => CheckOrm, (check) => check.monitor)
   checks!: CheckOrm[];
 

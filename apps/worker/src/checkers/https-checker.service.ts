@@ -21,17 +21,23 @@ export class HttpsCheckerService implements Checker {
       const statusCode = response.status;
       const responseSizeBytes = this.detectResponseSize(response.data, response.headers);
       const isExpectedStatus = statusCode === job.expectedStatus;
+      const isDegraded =
+        isExpectedStatus &&
+        typeof job.degradedThresholdMs === 'number' &&
+        latencyMs > job.degradedThresholdMs;
 
       return {
         monitorId: job.monitorId,
         checkedAt: new Date().toISOString(),
         region: job.region,
-        status: isExpectedStatus ? 'up' : 'down',
+        status: !isExpectedStatus ? 'down' : isDegraded ? 'degraded' : 'up',
         statusCode,
         latencyMs,
         responseSizeBytes,
         errorMessage: isExpectedStatus
-          ? null
+          ? isDegraded
+            ? `Response too slow: ${latencyMs}ms (threshold: ${job.degradedThresholdMs}ms)`
+            : null
           : `Unexpected HTTP status. Expected ${job.expectedStatus}, got ${statusCode}`,
       };
     } catch (error) {

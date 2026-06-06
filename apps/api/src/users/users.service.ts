@@ -54,6 +54,10 @@ export class UsersService {
     return this.usersRepo.save({ ...params, id });
   }
 
+  async softDelete(id: string) {
+    await this.usersRepo.softDelete(id);
+  }
+
   async upsert(params: CreateUserParams) {
     const existingUser = await this.findByEmail(params.email);
 

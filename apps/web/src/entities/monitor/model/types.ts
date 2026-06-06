@@ -24,6 +24,7 @@ export interface Monitor {
   createdAt: string;
   updatedAt: string;
   lastCheck: Check | null;
+  uptime30dPct: number | null;
 }
 
 export interface MonitorListQuery {

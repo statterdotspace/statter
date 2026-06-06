@@ -5,6 +5,7 @@ export {
   apiDefault,
 } from './api-client';
 export { authApi } from './auth-api';
+export { integrationsApi } from './integrations-api';
 export { workspaceApi } from './workspace-api';
 export { projectApi } from './project-api';
 export { monitorApi } from './monitor-api';

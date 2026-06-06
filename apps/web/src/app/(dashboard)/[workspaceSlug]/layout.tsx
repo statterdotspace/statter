@@ -1,10 +1,10 @@
 import { notFound, redirect } from 'next/navigation';
 import { AxiosError } from 'axios';
 import { WorkspaceContextInit } from '@/features/workspace';
-import { AppSidebar, MainNavbar } from '@/widgets/navigation';
-import { workspaceApi } from '@/shared/api';
+import { AppSidebar } from '@/widgets/navigation';
+import { userApi, workspaceApi } from '@/shared/api';
 import { ROUTES } from '@/shared/config';
-import type { Workspace } from '@/entities';
+import type { User, Workspace } from '@/entities';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -15,9 +15,13 @@ export default async function AppLayout({ children, params }: AppLayoutProps) {
   const { workspaceSlug } = await params;
 
   let workspaces: Workspace[] = [];
+  let currentUser: User | null = null;
 
   try {
-    workspaces = await workspaceApi.list();
+    [workspaces, currentUser] = await Promise.all([
+      workspaceApi.list(),
+      userApi.getMe(),
+    ]);
   } catch (err) {
     console.log(err);
     if (err instanceof AxiosError && err.response?.status === 401) {
@@ -42,15 +46,15 @@ export default async function AppLayout({ children, params }: AppLayoutProps) {
   const selectedWorkspaceSlug = selectedWorkspace.slug;
 
   return (
-    <div className="h-screen w-full overflow-hidden bg-neutral-300/80 p-3">
+    <div className="flex h-screen w-full overflow-hidden">
       <WorkspaceContextInit workspaceId={selectedWorkspaceId} />
-      <div className="mx-auto flex h-full max-w-[1920px] gap-2">
-        <AppSidebar
-          workspaces={workspaces}
-          selectedWorkspaceId={selectedWorkspaceId}
-          selectedWorkspaceSlug={selectedWorkspaceSlug}
-        />
-        <MainNavbar workspaceSlug={selectedWorkspaceSlug} />
+      <AppSidebar
+        workspaces={workspaces}
+        selectedWorkspaceId={selectedWorkspaceId}
+        selectedWorkspaceSlug={selectedWorkspaceSlug}
+        currentUser={currentUser}
+      />
+      <div className="flex flex-1 flex-col overflow-hidden">
         {children}
       </div>
     </div>

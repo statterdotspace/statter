@@ -6,6 +6,8 @@ import appConfig from './server/app.config';
 import storageConfig from './server/storage.config';
 import mailConfig from './server/mail.config';
 import rabbitmqConfig from './server/rabbitmq.config';
+import telegramConfig from './server/telegram.config';
+import slackConfig from './server/slack.config';
 
 export const serverConfig = [
   databaseConfig,
@@ -16,6 +18,8 @@ export const serverConfig = [
   storageConfig,
   mailConfig,
   rabbitmqConfig,
+  telegramConfig,
+  slackConfig,
 ];
 
 export {
@@ -27,6 +31,8 @@ export {
   storageConfig,
   mailConfig,
   rabbitmqConfig,
+  telegramConfig,
+  slackConfig,
 };
 
 export * from './server/types';

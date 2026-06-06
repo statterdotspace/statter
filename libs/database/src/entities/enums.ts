@@ -55,3 +55,9 @@ export enum CheckStatus {
   DEGRADED = 'degraded',
   TIMEOUT = 'timeout',
 }
+
+export enum NotificationChannel {
+  EMAIL = 'email',
+  TELEGRAM = 'telegram',
+  SLACK = 'slack',
+}

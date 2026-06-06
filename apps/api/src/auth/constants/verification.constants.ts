@@ -1,6 +1,7 @@
 export enum VerificationType {
   EMAIL = 'email',
   LOGIN_TWO_FACTOR = 'login_two_factor',
+  CHANGE_PASSWORD = 'change_password',
 }
 
 export enum VerificationCheck {

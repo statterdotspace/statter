@@ -16,6 +16,7 @@ import {
   MonitorIncidentsCard,
   MonitorLatencyChartCard,
 } from '@/widgets/monitors';
+import { UptimeBar } from '@/widgets/monitors/ui/uptime-bar';
 import { PageContainer, PageContent, PageHeader } from '@/shared/ui/page-wrapper';
 
 interface MonitorDetailsPageClientProps {
@@ -43,24 +44,16 @@ const MonitorDetailsPageClient = ({ workspaceSlug, monitorId }: MonitorDetailsPa
   });
 
   useEffect(() => {
-    if (typeof document === 'undefined') {
-      return;
-    }
-
+    if (typeof document === 'undefined') return;
     setWorkspaceId(getCookieValue(document.cookie, WORKSPACE_COOKIE_NAME));
   }, []);
 
   const handleCheckEvent = useCallback(
     (event: ChecksRealtimeEvent) => {
-      if (event.monitorId !== monitorId) {
-        return;
-      }
+      if (event.monitorId !== monitorId) return;
 
       queryClient.setQueryData<Monitor>(['monitor', monitorId], (monitor) => {
-        if (!monitor) {
-          return monitor;
-        }
-
+        if (!monitor) return monitor;
         return {
           ...monitor,
           lastCheckAt: event.monitor.lastCheckAt,
@@ -73,36 +66,28 @@ const MonitorDetailsPageClient = ({ workspaceSlug, monitorId }: MonitorDetailsPa
       queryClient.setQueriesData<Check[]>(
         { queryKey: ['monitor-check-history', monitorId] },
         (checks) => {
-          if (!checks) {
-            return checks;
-          }
-
-          const withoutDuplicate = checks.filter((item) => item.id !== event.check.id);
-          return [event.check, ...withoutDuplicate].slice(0, historyQueryLimit);
+          if (!checks) return checks;
+          const without = checks.filter((c) => c.id !== event.check.id);
+          return [event.check, ...without].slice(0, historyQueryLimit);
         }
       );
+
+      // Invalidate stats so metrics refresh after new check arrives
+      void queryClient.invalidateQueries({ queryKey: ['monitor-stats', monitorId] });
     },
     [monitorId, queryClient]
   );
 
-  useChecksRealtime({
-    workspaceId,
-    onEvent: handleCheckEvent,
-  });
+  useChecksRealtime({ workspaceId, onEvent: handleCheckEvent });
 
   const isLoading = !workspaceId || monitorQuery.isLoading || historyQuery.isLoading;
   const monitor = monitorQuery.data ?? null;
   const checks = historyQuery.data ?? [];
 
-  const monitorDetailsInsights = useMonitorDetailsInsights({ checks });
+  const insights = useMonitorDetailsInsights({ monitorId, checks });
 
-  if (isLoading) {
-    return <MonitorDetailsLoadingState />;
-  }
-
-  if (!monitor) {
-    return <MonitorDetailsNotFoundState />;
-  }
+  if (isLoading) return <MonitorDetailsLoadingState />;
+  if (!monitor) return <MonitorDetailsNotFoundState />;
 
   return (
     <PageContainer>
@@ -114,23 +99,35 @@ const MonitorDetailsPageClient = ({ workspaceSlug, monitorId }: MonitorDetailsPa
         <MonitorDetailsSummaryCard monitor={monitor} />
 
         <MonitorDetailsStatsGrid
-          availability24h={monitorDetailsInsights.availability24h}
-          avgLatencyMs={monitorDetailsInsights.avgLatencyMs}
-          checks24hCount={monitorDetailsInsights.checks24hCount}
-          failed24hCount={monitorDetailsInsights.failed24hCount}
+          isLoading={insights.isLoading}
+          uptimePct={insights.uptimePct}
+          p50Ms={insights.p50Ms}
+          p95Ms={insights.p95Ms}
+          p99Ms={insights.p99Ms}
+          totalChecks={insights.totalChecks}
+          downChecks={insights.downChecks}
+          timeoutChecks={insights.timeoutChecks}
+          degradedChecks={insights.degradedChecks}
         />
 
+        <div>
+          <p className="mb-1.5 text-xs font-medium text-neutral-500 uppercase tracking-wide">
+            30-day uptime
+          </p>
+          <UptimeBar dailyUptime={insights.dailyUptime} />
+        </div>
+
         <MonitorLatencyChartCard
-          chartData={monitorDetailsInsights.chartData}
-          timeRange={monitorDetailsInsights.timeRange}
-          timeRangeLabel={monitorDetailsInsights.timeRangeLabel}
-          isHourlyRange={monitorDetailsInsights.isHourlyRange}
-          onTimeRangeChange={monitorDetailsInsights.setTimeRange}
+          chartData={insights.chartData}
+          timeRange={insights.timeRange}
+          timeRangeLabel={insights.timeRangeLabel}
+          isHourlyRange={insights.isHourlyRange}
+          onTimeRangeChange={insights.setTimeRange}
         />
 
         <MonitorIncidentsCard
-          incidents={monitorDetailsInsights.incidents}
-          timeRangeLabel={monitorDetailsInsights.timeRangeLabel}
+          incidents={insights.incidents}
+          timeRangeLabel={insights.timeRangeLabel}
         />
       </PageContent>
     </PageContainer>

@@ -2,9 +2,8 @@ import Link from 'next/link';
 import { Globe, Link2 } from 'lucide-react';
 import type { Monitor } from '@/entities';
 import { Checkbox } from '@/shared/ui/checkbox';
-import { monitorStatusClass, uptimeFromId } from '@/entities/monitor';
+import { monitorStatusClass } from '@/entities/monitor';
 import { MonitorActionsMenu } from './monitor-actions-menu';
-import { UptimeBar } from './uptime-bar';
 
 interface MonitorListItemProps {
   monitor: Monitor;
@@ -23,8 +22,6 @@ const MonitorListItem = ({
   onEdit,
   onDelete,
 }: MonitorListItemProps) => {
-  const uptime = uptimeFromId(monitor.id);
-
   return (
     <article className="group flex items-start gap-3 rounded-2xl border border-neutral-200 px-4 py-4 transition-colors hover:border-neutral-300 hover:bg-neutral-50/40">
       <div className="mt-0.5 flex size-11 shrink-0 items-center justify-center">
@@ -49,6 +46,11 @@ const MonitorListItem = ({
           >
             {monitor.status}
           </span>
+          {monitor.uptime30dPct !== null && (
+            <span className="text-xs text-neutral-500 tabular-nums">
+              {monitor.uptime30dPct}% uptime
+            </span>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-neutral-500">
@@ -62,7 +64,6 @@ const MonitorListItem = ({
           </span>
         </div>
 
-        <UptimeBar uptime={uptime} seed={monitor.id} />
       </Link>
 
       <MonitorActionsMenu onEdit={() => onEdit(monitor)} onDelete={() => onDelete(monitor)} />

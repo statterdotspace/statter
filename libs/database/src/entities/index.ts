@@ -6,3 +6,4 @@ export * from './workspace.entity';
 export * from './invitations.entity';
 export * from './project.entity';
 export * from './monitor.entity';
+export * from './workspace-integration.entity';

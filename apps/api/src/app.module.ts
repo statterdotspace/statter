@@ -15,6 +15,7 @@ import { RedisModule } from './core/modules/redis/redis.module';
 import { MailerModule } from './core/modules/mailer/mailer.module';
 import { InvitationsModule } from './invitations/invitations.module';
 import { MembersModule } from './members/members.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { MembersModule } from './members/members.module';
     MonitorModule,
     CheckModule,
     MembersModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
 })

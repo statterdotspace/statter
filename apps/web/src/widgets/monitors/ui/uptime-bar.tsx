@@ -1,35 +1,65 @@
-interface UptimeBarProps {
-  uptime: number;
-  seed: string;
+import type { StatsDailyUptime } from '@/entities';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
+
+type SegmentStatus = 'up' | 'degraded' | 'down' | 'nodata';
+
+function segmentStatus(uptimePct: number): SegmentStatus {
+  if (uptimePct >= 99.9) return 'up';
+  if (uptimePct >= 95) return 'degraded';
+  return 'down';
 }
 
-const UptimeBar = ({ uptime, seed }: UptimeBarProps) => {
-  const seedHash = Array.from(seed).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+const segmentClass: Record<SegmentStatus, string> = {
+  up: 'bg-emerald-500',
+  degraded: 'bg-yellow-400',
+  down: 'bg-rose-500',
+  nodata: 'bg-neutral-200',
+};
 
-  const segments = Array.from({ length: 30 }, (_, index) => {
-    const value = (Math.sin(seedHash + index * 17) + 1) / 2;
+interface UptimeBarProps {
+  dailyUptime: StatsDailyUptime[];
+}
 
-    if (uptime > 99) {
-      return value > 0.1 ? 'up' : 'down';
-    }
+const UptimeBar = ({ dailyUptime }: UptimeBarProps) => {
+  // Build a 30-slot array (oldest → newest), filling missing days with nodata
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-    if (uptime > 98) {
-      return value > 0.2 ? 'up' : value > 0.1 ? 'warning' : 'down';
-    }
+  const byDay = new Map(
+    dailyUptime.map((d) => {
+      const day = new Date(d.day);
+      day.setHours(0, 0, 0, 0);
+      return [day.getTime(), d];
+    })
+  );
 
-    return value > 0.3 ? 'up' : value > 0.15 ? 'warning' : 'down';
+  const segments = Array.from({ length: 30 }, (_, i) => {
+    const day = new Date(today);
+    day.setDate(today.getDate() - (29 - i));
+    const data = byDay.get(day.getTime());
+    return { day, data };
   });
 
   return (
     <div className="flex h-6 items-end gap-[2px]">
-      {segments.map((status, index) => (
-        <div
-          key={`${seed}-${index}`}
-          className={`h-5 w-2 rounded-sm ${
-            status === 'up' ? 'bg-emerald-500' : status === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
-          }`}
-        />
-      ))}
+      {segments.map(({ day, data }, i) => {
+        const status: SegmentStatus = data ? segmentStatus(data.uptimePct) : 'nodata';
+        const label = day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const tooltip = data
+          ? `${label} — ${data.uptimePct}% uptime (${data.totalChecks} checks)`
+          : `${label} — no data`;
+
+        return (
+          <Tooltip key={i}>
+            <TooltipTrigger>
+              <div className={`h-5 w-2 rounded-sm cursor-default ${segmentClass[status]}`} />
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p className="text-xs">{tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        );
+      })}
     </div>
   );
 };

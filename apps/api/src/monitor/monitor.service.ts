@@ -123,13 +123,64 @@ export class MonitorService {
       return new Map<string, CheckOrm | null>();
     }
 
-    const checks = await Promise.all(
-      monitorIds.map(async (monitorId) => ({
-        monitorId,
-        check: await this.findLatestCheckByMonitorId(monitorId),
-      }))
+    // Single query: DISTINCT ON per monitor ordered by checkedAt DESC
+    const rows = await this.checkRepo.query<Array<{ id: string; monitor_id: string }>>(
+      `
+      SELECT DISTINCT ON (monitor_id) id, monitor_id
+      FROM checks
+      WHERE monitor_id = ANY($1::uuid[])
+      ORDER BY monitor_id, checked_at DESC
+      `,
+      [monitorIds]
     );
 
-    return new Map(checks.map((item) => [item.monitorId, item.check]));
+    const idToMonitorId = new Map(rows.map((r) => [r.id, r.monitor_id]));
+    if (idToMonitorId.size === 0) {
+      return new Map(monitorIds.map((id) => [id, null]));
+    }
+
+    const checks = await this.checkRepo.findBy(
+      Array.from(idToMonitorId.keys()).map((id) => ({ id }))
+    );
+
+    const result = new Map<string, CheckOrm | null>(monitorIds.map((id) => [id, null]));
+    for (const check of checks) {
+      result.set(check.monitorId, check);
+    }
+    return result;
+  }
+
+  async getUptime30dBatch(monitorIds: string[]): Promise<Map<string, number>> {
+    if (monitorIds.length === 0) return new Map();
+
+    const rows = await this.checkRepo.query<Array<{ monitor_id: string; uptime_pct: string }>>(
+      `
+      WITH period_checks AS (
+        SELECT
+          monitor_id,
+          status,
+          checked_at,
+          LEAD(checked_at) OVER (PARTITION BY monitor_id ORDER BY checked_at) AS next_checked_at
+        FROM checks
+        WHERE monitor_id = ANY($1::uuid[])
+          AND checked_at > NOW() - INTERVAL '30 days'
+      )
+      SELECT
+        monitor_id,
+        ROUND(
+          COALESCE(
+            SUM(EXTRACT(EPOCH FROM (next_checked_at - checked_at))) FILTER (WHERE status = 'up')::numeric
+              / NULLIF(SUM(EXTRACT(EPOCH FROM (next_checked_at - checked_at)))::numeric, 0) * 100,
+            100
+          ), 2
+        ) AS uptime_pct
+      FROM period_checks
+      WHERE next_checked_at IS NOT NULL
+      GROUP BY monitor_id
+      `,
+      [monitorIds]
+    );
+
+    return new Map(rows.map((r) => [r.monitor_id, Number(r.uptime_pct)]));
   }
 }

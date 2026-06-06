@@ -2,14 +2,16 @@ import { cn } from '@/shared/lib/utils';
 
 export const PageContainer = ({ children }: { children: React.ReactNode }) => {
   return (
-    <main className="bg-neutral-50 flex h-full w-full flex-1 flex-col overflow-y-auto rounded-xl">
+    <main className="flex h-full w-full flex-1 flex-col overflow-y-auto bg-neutral-50">
       {children}
     </main>
   );
 };
 
 export const PageHeader = ({ children }: { children: React.ReactNode }) => (
-  <div className={'flex h-12 items-center justify-between border-b px-6 sm:h-16'}>{children}</div>
+  <div className={'flex h-12 bg-background items-center justify-between border-b px-6 sm:h-16'}>
+    {children}
+  </div>
 );
 
 export const PageTitle = ({ children }: { children: React.ReactNode }) => (
