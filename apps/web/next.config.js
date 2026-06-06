@@ -14,6 +14,9 @@ const nextConfig = {
   // turbopack: {
   //   root: path.resolve(__dirname, '../..'),
   // },
+  env: {
+    API_URL: process.env.API_URL,
+  },
 };
 
 const plugins = [
