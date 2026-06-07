@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CheckJobPayload, getChecksQueueName } from '@statter/utils';
+import { CheckJobPayload, getChecksDlxName, getChecksQueueName } from '@statter/utils';
 import { BaseRabbitMqPublisher, RabbitMqConnectionService } from '@statter/rabbitmq';
 
 @Injectable()
@@ -49,7 +49,11 @@ export class RabbitMqPublisherService extends BaseRabbitMqPublisher {
     }
 
     const queueName = getChecksQueueName(region);
-    await this.channel.assertQueue(queueName, { durable: true });
+    const dlxName = getChecksDlxName();
+    await this.channel.assertQueue(queueName, {
+      durable: true,
+      arguments: { 'x-dead-letter-exchange': dlxName },
+    });
     await this.channel.bindQueue(queueName, this.exchangeName, region);
     this.assertedRegions.add(region);
   }
